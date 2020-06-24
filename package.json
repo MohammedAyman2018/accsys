@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "fast": "git add . && git commit -m \"deploy bug\" && git push heroku master && git push origin master",
+    "fast": "git add . && git commit -m \"deploy bug\" &&  git push origin master",
     "dev": "nodemon",
     "stop": "taskkill -f -im node.exe",
     "commit": "git add . && git commit -m",
