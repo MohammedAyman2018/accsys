@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const { Medical } = require("../models/product_model");
+const { Medical } = require("../models/Product_model");
 const { upload } = require('../middlewares/upload')
 
 const pro = require('../controllers/product_ctrl');

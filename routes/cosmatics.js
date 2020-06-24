@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const { Cosmatics } = require("../models/product_model");
+const { Cosmatics } = require("../models/Product_model");
 const { upload } = require('../middlewares/upload')
 
 const pro = require('../controllers/product_ctrl');

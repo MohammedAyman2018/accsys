@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const { Makups } = require("../models/product_model");
+const { Makups } = require("../models/Product_model");
 const { upload } = require('../middlewares/upload')
 
 const pro = require('../controllers/product_ctrl');
