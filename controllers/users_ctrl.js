@@ -53,6 +53,8 @@ exports.get_one_user = async (req, res) => {
  * @param { Boolean } superAdmin
  */
 exports.add_user = async (req, res) => {
+  if (req.body.fbid == '') delete req.body.fbid;
+  if (req.body.goid == '') delete req.body.goid;
   const { error } = validate(req.body);
   if (error) return res.status(400).json({ "msg": error.details[0].message });
 
@@ -68,8 +70,20 @@ exports.add_user = async (req, res) => {
     city
   } = req.body;
 
-  let user = await User.find({ $or: [{ tel }, { email }, { fbid }, { goid }] });
-  if (user) return res.status(400).json({ "msg": "This user existes before" })
+  console.log(!!fbid, !!goid);
+  
+
+  let query = [{ tel }, { email }]
+  if (!!fbid) query.push({ fbid: fbid })
+  else if (!!goid) query.push({ goid: goid })
+
+  console.log(query);
+
+  let user = await User.find({ $or: query })
+  // .then(user => console.log(user))
+  console.log(user);
+
+  if (user.length > 0) return res.status(400).json({ "msg": "This user existes before" })
 
   user = new User({ name, tel, password, adress, image, email, fbid, goid, city });
 

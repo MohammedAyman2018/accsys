@@ -184,11 +184,11 @@ exports.edit_product = async (req, res, the_class) => {
 exports.edit_product_amount = async (req, res, the_class) => {
   /** Get req.body */
   const { barcode, amount } = req.body;
-
+  
   /** Check if sold out */
-  await the_class.findOne({ barcode: barcode })
+  await the_class.findOne({ barcode })
     .then(async product => {
-      if (amount < 0 && (product.amount += Number(amount)) < 0) return res.status(400).json({ "msg": "Can't sell all this amount" });
+      if (amount < 0 && (product.amount + Number(amount)) < 0) return res.status(400).json({ "msg": "Can't sell all this amount" });
 
       product.amount += Number(amount);
 

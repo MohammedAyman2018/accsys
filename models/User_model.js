@@ -21,14 +21,8 @@ const Schema = new mongoose.Schema({
     type: String,
     unique: true
   },
-  fbid: {
-    type: String,
-    unique: true
-  },
-  goid: {
-    type: String,
-    unique: true
-  },
+  fbid: String,
+  goid: String,
   
   adress: String,
   image: String,
@@ -56,8 +50,8 @@ function validate(user) {
     tel: Joi.string(),
     adress: Joi.string(),
     email: Joi.string().email(),
-    fbid: Joi.string(),
-    goid: Joi.string(),
+    fbid: Joi.string().allow('').allow(null).min(0),
+    goid: Joi.string().allow('').allow(null).min(0),
     city: Joi.string(),
     admin: Joi.boolean(),
     fav: Joi.array(),
