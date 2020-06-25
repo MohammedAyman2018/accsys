@@ -54,6 +54,7 @@ function validate(user) {
     goid: Joi.string().allow('').allow(null).min(0),
     city: Joi.string(),
     admin: Joi.boolean(),
+    image,
     fav: Joi.array(),
     superAdmin: Joi.boolean()
   });
