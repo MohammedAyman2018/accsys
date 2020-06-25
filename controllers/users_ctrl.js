@@ -141,12 +141,6 @@ exports.edit_user = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password, fbid, goid, tel } = req.body;
 
-  let noEmailORTel = (!(!!email || !!tel) || !password);
-  let noFbORGo = (!!fbid || !!goid);
-
-  if (noEmailORTel || noEmailORTel) {
-    return res.status(400).json({ msg: 'Please enter all fields' });
-  }
 
   let query;
   if (tel) query = { tel }
