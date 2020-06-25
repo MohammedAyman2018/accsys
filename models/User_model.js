@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('@hapi/joi');
+const { array } = require('@hapi/joi');
 
 
 const Schema = new mongoose.Schema({
@@ -11,13 +12,15 @@ const Schema = new mongoose.Schema({
     type: String,
     required: true
   },
+
   tel: {
     type: String,
     unique: true
   },
-  adress: String,
-  image: String,
-  email: String,
+  email: {
+    type: String,
+    unique: true
+  },
   fbid: {
     type: String,
     unique: true
@@ -26,7 +29,12 @@ const Schema = new mongoose.Schema({
     type: String,
     unique: true
   },
+  
+  adress: String,
+  image: String,
   city: String,
+  
+  fav: [String],
   admin: {
     type: Boolean,
     default: false
@@ -52,6 +60,7 @@ function validate(user) {
     goid: Joi.string(),
     city: Joi.string(),
     admin: Joi.boolean(),
+    fav: Joi.array(),
     superAdmin: Joi.boolean()
   });
 

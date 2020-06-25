@@ -40,8 +40,17 @@ exports.get_one_user = async (req, res) => {
 }
 
 /** Add users
- * @param { RequestInfo } req
- * @param { Response } res
+ * @param { String } name
+ * @param { String } tel
+ * @param { String } adress
+ * @param { String } image
+ * @param { String } password
+ * @param { String } email
+ * @param { String } fbid
+ * @param { String } goid
+ * @param { String } city
+ * @param { Boolean } admin
+ * @param { Boolean } superAdmin
  */
 exports.add_user = async (req, res) => {
   const { error } = validate(req.body);
@@ -59,7 +68,10 @@ exports.add_user = async (req, res) => {
     city
   } = req.body;
 
-  let user = new User({ name, tel, password, adress, image, email, fbid, goid, city });
+  let user = await User.find({ $or: [{ tel }, { email }, { fbid }, { goid }] });
+  if (user) return res.status(400).json({ "msg": "This user existes before" })
+
+  user = new User({ name, tel, password, adress, image, email, fbid, goid, city });
 
   if (req.file) {
     await cloudinary.uploader.upload(req.file.path,
@@ -79,31 +91,12 @@ exports.add_user = async (req, res) => {
 
       await user.save()
         .then(user => {
-
-          jwt.sign({ id: user._id }, process.env.jwtSecret, { expiresIn: 3600 }, (err, token) => {
-            if (err) return res.status(400).json(err);
-
-            res.status(200).json({
-              token,
-              user: {
-                userid: user.userid,
-                id: user.id,
-                admin: user.admin,
-                name: user.name,
-                lastname: user.lastname,
-                email: user.email,
-                lang: user.lang,
-              }
-            });
-          });
+          delete user.password;
+          res.status(200).json(user);
         })
-        .catch(err => {
-          res.status(400).json(err)
-        });
+        .catch(err => res.status(400).json(err));
     })
   })
-
-
 };
 
 /** Edit user */
@@ -112,10 +105,9 @@ exports.edit_user = async (req, res) => {
     console.log(req.file);
     await User.updateOne({ _id: req.params.id }, { $set: req.body })
       .then(user => res.json({ success: true }))
-      .catch(err => res.status(404).json({ success: false }));
+      .catch(err => res.status(404).json({ "msg": err }));
   } else {
     let image;
-    console.log(req.file.path);
 
     await cloudinary.uploader.upload(req.file.path,
       { resource_type: "auto", folder: "accsys", public_id: `user-${req.params.id}` },
@@ -125,27 +117,28 @@ exports.edit_user = async (req, res) => {
         /** Create the new product */
         image = result.url;
       });
-    console.log(image);
 
     await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, image } })
       .then(user => res.json({ success: true }))
-      .catch(err => res.status(404).json({ success: false }));
+      .catch(err => res.status(404).json({ "msg": err }));
   }
 }
 
 exports.login = async (req, res) => {
-  const { email, password, tel } = req.body;
+  const { email, password, fbid, goid, tel } = req.body;
 
-  console.log(req.body);
-  console.log(!(!!email || !!tel));
+  let noEmailORTel = (!(!!email || !!tel) || !password);
+  let noFbORGo = (!!fbid || !!goid);
 
-  if (!(!!email || !!tel) || !password) {
+  if (noEmailORTel || noEmailORTel) {
     return res.status(400).json({ msg: 'Please enter all fields' });
   }
 
   let query;
   if (tel) query = { tel }
   else if (email) query = { email }
+  else if (fbid) query = { fbid };
+  else query = { goid };
 
   // Check for existing user
   await User.findOne(query)
@@ -156,30 +149,8 @@ exports.login = async (req, res) => {
       bcrypt.compare(password, user.password)
         .then(isMatch => {
           if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
-
-          jwt.sign(
-            { id: user._id },
-            process.env.jwtSecret,
-            { expiresIn: 36000 },
-            (err, token) => {
-              if (err) throw err;
-              res.json({
-                token,
-                user: {
-                  name: user.name,
-                  tel: user.tel,
-                  adress: user.adress,
-                  image: user.image,
-                  email: user.email,
-                  fbid: user.fbid,
-                  goid: user.goid,
-                  city: user.city,
-                  admin: user.admin,
-                  superAdmin: user.superAdmin
-                }
-              });
-            }
-          )
+          delete user.password;
+          res.json(user);
         })
     })
 }
