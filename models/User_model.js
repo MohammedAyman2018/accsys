@@ -10,7 +10,6 @@ const Schema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
   },
 
   tel: {
@@ -46,7 +45,7 @@ let User = mongoose.model('users', Schema);
 function validate(user) {
   const userSchema = Joi.object({
     name: Joi.string().required(),
-    password: Joi.string().required(),
+    password: Joi.string(),
     tel: Joi.string(),
     adress: Joi.string(),
     email: Joi.string().email(),
