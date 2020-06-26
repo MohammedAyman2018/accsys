@@ -1,7 +1,6 @@
 const
-  { validate, User } = require("../models/User_model"),
+  {  User } = require("../models/User_model"),
   cloudinary = require('cloudinary').v2,
-  jwt = require('jsonwebtoken'),
   bcrypt = require('bcrypt');
 
 require('dotenv');
@@ -53,10 +52,11 @@ exports.get_one_user = async (req, res) => {
  * @param { Boolean } superAdmin
  */
 exports.add_user = async (req, res) => {
-  if (req.body.fbid == '') delete req.body.fbid;
-  if (req.body.goid == '') delete req.body.goid;
-  const { error } = validate(req.body);
-  if (error) return res.status(400).json({ "msg": error.details[0].message });
+  if (!(!!req.body.fbid)) delete req.body.fbid;
+  if (!(!!req.body.goid)) delete req.body.goid;
+  if (!(!!req.body.tel)) delete req.body.tel;
+  // const { error } = validate(req.body);
+  // if (error) return res.status(400).json({ "msg": error.details[0].message });
 
   const {
     name,
@@ -70,10 +70,14 @@ exports.add_user = async (req, res) => {
     city
   } = req.body;
 
-  let query = [{ tel }, { email }]
+  let query = [{ email }];
+  if (!!tel) query.push({ tel })
+  
   if (!!fbid) query.push({ fbid: fbid })
   else if (!!goid) query.push({ goid: goid })
 
+  console.log('query: ', query);
+  
   let user = await User.find({ $or: query })
 
   if (user.length > 0) return res.status(400).json({ "msg": "This user existes before" })
@@ -155,7 +159,8 @@ exports.login = async (req, res) => {
     .then(user => {
       if (!user) return res.status(400).json({ msg: 'User Does not exist' });
 
-      if (password) {
+      if (email) {
+        if(!password) return res.status(400).json({ msg: 'No password provided' })
         // Validate password
         bcrypt.compare(password, user.password)
           .then(isMatch => {

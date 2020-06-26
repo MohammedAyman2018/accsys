@@ -56,7 +56,10 @@ exports.get_one_product = async (req, res, the_class) => {
         samilier: await the_class.find({ brand: product.brand }).limit(9)
       })
     })
-    .catch(err => res.status(400).json({ "msg": err.message }));
+    .catch(err => {
+      console.log({ "msg": err.message })
+      res.status(400).json({ "msg": err.message })
+    });
 }
 
 

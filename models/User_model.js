@@ -14,7 +14,6 @@ const Schema = new mongoose.Schema({
 
   tel: {
     type: String,
-    unique: true
   },
   email: {
     type: String,
@@ -42,25 +41,25 @@ const Schema = new mongoose.Schema({
 
 let User = mongoose.model('users', Schema);
 
-function validate(user) {
-  const userSchema = Joi.object({
-    name: Joi.string().required(),
-    password: Joi.string(),
-    tel: Joi.string(),
-    adress: Joi.string(),
-    email: Joi.string().email(),
-    fbid: Joi.string().allow('').allow(null).min(0),
-    goid: Joi.string().allow('').allow(null).min(0),
-    city: Joi.string(),
-    admin: Joi.boolean(),
-    image: Joi.allow(null).optional(),
-    fav: Joi.array(),
-    superAdmin: Joi.boolean()
-  });
+// function validate(user) {
+//   const userSchema = Joi.object({
+//     name: Joi.string().required(),
+//     password: Joi.string(),
+//     tel: Joi.string(),
+//     adress: Joi.string(),
+//     email: Joi.string().email(),
+//     fbid: Joi.string().allow('').allow(null).min(0),
+//     goid: Joi.string().allow('').allow(null).min(0),
+//     city: Joi.string(),
+//     admin: Joi.boolean(),
+//     image: Joi.allow(null).optional(),
+//     fav: Joi.array(),
+//     superAdmin: Joi.boolean()
+//   });
 
-  return userSchema.validate(user, { abortEarly: false });
-};
+//   return userSchema.validate(user, { abortEarly: false });
+// };
 
 
-module.exports.validate = validate;
+// module.exports.validate = validate;
 module.exports.User = User;
