@@ -70,18 +70,11 @@ exports.add_user = async (req, res) => {
     city
   } = req.body;
 
-  console.log(!!fbid, !!goid);
-  
-
   let query = [{ tel }, { email }]
   if (!!fbid) query.push({ fbid: fbid })
   else if (!!goid) query.push({ goid: goid })
 
-  console.log(query);
-
   let user = await User.find({ $or: query })
-  // .then(user => console.log(user))
-  console.log(user);
 
   if (user.length > 0) return res.status(400).json({ "msg": "This user existes before" })
 
@@ -98,25 +91,34 @@ exports.add_user = async (req, res) => {
       });
   }
 
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(user.password, salt, async (err, hash) => {
-      if (err) throw err;
-      user.password = hash;
+  if (password) {
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, async (err, hash) => {
+        if (err) throw err;
+        user.password = hash;
 
-      await user.save()
-        .then(user => {
-          delete user.password;
-          res.status(200).json(user);
-        })
-        .catch(err => res.status(400).json(err));
+        await user.save()
+          .then(user => {
+            delete user.password;
+            res.status(200).json(user);
+          })
+          .catch(err => res.status(400).json(err));
+      })
     })
-  })
+  } else {
+    await user.save()
+      .then(user => {
+        delete user.password;
+        res.status(200).json(user);
+      })
+      .catch(err => res.status(400).json(err));
+  }
+
 };
 
 /** Edit user */
 exports.edit_user = async (req, res) => {
   if (!req.file) {
-    console.log(req.file);
     await User.updateOne({ _id: req.params.id }, { $set: req.body })
       .then(user => res.json({ success: true }))
       .catch(err => res.status(404).json({ "msg": err }));
@@ -153,13 +155,18 @@ exports.login = async (req, res) => {
     .then(user => {
       if (!user) return res.status(400).json({ msg: 'User Does not exist' });
 
-      // Validate password
-      bcrypt.compare(password, user.password)
-        .then(isMatch => {
-          if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
-          delete user.password;
-          res.json(user);
-        })
+      if (password) {
+        // Validate password
+        bcrypt.compare(password, user.password)
+          .then(isMatch => {
+            if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+            delete user.password;
+            res.status(200).json(user);
+          })
+      } else {
+        delete user.password;
+        res.status(200).json(user);
+      }
     })
 }
 
