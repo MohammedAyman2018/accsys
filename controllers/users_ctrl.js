@@ -15,7 +15,7 @@ cloudinary.config({
  * @param { RequestInfo } req
  * @param { Response } res
  */
-exports.get_all_users = async (req, res) => {
+exports.getAllUsers = async (req, res) => {
   res.status(200).json(await User.find({}))
 }
 
@@ -23,7 +23,7 @@ exports.get_all_users = async (req, res) => {
  * @param { RequestInfo } req
  * @param { Response } res
  */
-exports.get_one_user = async (req, res) => {
+exports.getOneUser = async (req, res) => {
   const { tel, email, fbid, goid } = req.body
 
   let query = {}
@@ -51,7 +51,7 @@ exports.get_one_user = async (req, res) => {
  * @param { Boolean } admin
  * @param { Boolean } superAdmin
  */
-exports.add_user = async (req, res) => {
+exports.addUser = async (req, res) => {
   if (!req.body.fbid) delete req.body.fbid
   if (!req.body.goid) delete req.body.goid
   if (!req.body.tel) delete req.body.tel
@@ -120,7 +120,7 @@ exports.add_user = async (req, res) => {
 }
 
 /** Edit user */
-exports.edit_user = async (req, res) => {
+exports.editUser = async (req, res) => {
   if (req.body.password) {
     let password = req.body.password
     console.log(password)
@@ -197,7 +197,7 @@ exports.login = async (req, res) => {
  * @param { RequestInfo } req
  * @param { Response } res
 */
-exports.delete_one = async (req, res) => {
+exports.deleteOne = async (req, res) => {
   await User.findByIdAndDelete(req.params.id)
     .then(user => {
       res.status(200).json({ success: true })
@@ -209,7 +209,7 @@ exports.delete_one = async (req, res) => {
  * @param { RequestInfo } req
  * @param { Response } res
 */
-exports.delete_all = async (req, res) => {
+exports.deleteAll = async (req, res) => {
   try {
     await User.deleteMany({})
     res.status(200).json({ msg: 'done' })

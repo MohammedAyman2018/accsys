@@ -12,7 +12,7 @@ cloudinary.config({
 /** Get All Data
  * @returns { object } All products
  */
-exports.get_all_products = async (req, res, theClass) => {
+exports.getAllProducts = async (req, res, theClass) => {
   await theClass.find({})
     .then(products => res.status(200).json(products))
     .catch(err => res.status(200).json(err))
@@ -22,7 +22,7 @@ exports.get_all_products = async (req, res, theClass) => {
  * @param { Number } page The page number
  * @returns { object } All products
  */
-exports.get_with_pagenation = async (req, res, theClass) => {
+exports.getWithPagenation = async (req, res, theClass) => {
   var perPage = 9
   var page = req.params.page || 1
 
@@ -46,7 +46,7 @@ exports.get_with_pagenation = async (req, res, theClass) => {
  * @param { Number } barcode
  * @returns { object } The product
  */
-exports.get_one_product = async (req, res, theClass) => {
+exports.getOneProduct = async (req, res, theClass) => {
   await theClass.findOne({ barcode: req.params.barcode })
     .then(async product => {
       if (!product) return res.status(400).json({ msg: 'There is no product.' })
@@ -91,7 +91,7 @@ exports.filter = async (req, res, theClass) => {
  * @param { Response } res
  * @param { ClassDecorator } theClass
  */
-exports.add_product = async (req, res, theClass) => {
+exports.addProduct = async (req, res, theClass) => {
   console.log(req.body)
 
   /** Check For Errors */
@@ -127,7 +127,7 @@ exports.add_product = async (req, res, theClass) => {
 }
 
 /** Edit Product */
-exports.edit_product = async (req, res, theClass) => {
+exports.editProduct = async (req, res, theClass) => {
   console.log(req.body)
 
   /** Check For Errors */
@@ -180,7 +180,7 @@ exports.edit_product = async (req, res, theClass) => {
  * @param { String } barcode
  * @param { Number } amount
  */
-exports.edit_product_amount = async (req, res, theClass) => {
+exports.editProductAmount = async (req, res, theClass) => {
   /** Get req.body */
   const { barcode, amount } = req.body
 
@@ -201,7 +201,7 @@ exports.edit_product_amount = async (req, res, theClass) => {
 /** Delete Product
  * @param { String } barcode
 */
-exports.delete_one = async (req, res, theClass) => {
+exports.deleteOne = async (req, res, theClass) => {
   const id = req.params.id
   /** Get the product and update it */
   await theClass.findOneAndDelete({ id }, (err, product) => {
@@ -214,7 +214,7 @@ exports.delete_one = async (req, res, theClass) => {
 
 /** Delete All
 */
-exports.delete_all = async (req, res, theClass) => {
+exports.deleteAll = async (req, res, theClass) => {
   await theClass.deleteMany({})
     .then(() => {
       res.status(200).json({ msg: 'done' })

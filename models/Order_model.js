@@ -1,40 +1,36 @@
 const mongoose = require('mongoose')
-const Joi = require('@hapi/joi')
+// const Joi = require('@hapi/joi')
 const { UserSchema } = require('../models/User_model')
-const { ProductSchema } = require('../models/Product_model')
 
 const Schema = new mongoose.Schema({
-  by: {
+  by: { // الاوردر لمين
     type: UserSchema,
     required: true
   },
-  product: {
-    type: ProductSchema,
+  products: { // المنتجات و كميتها
+    type: [Object],
     required: true
   },
-  amount: {
-    type: Number,
-    required: true
+  delivery: { // رد على الزبون ولا لا
+    type: Boolean,
+    default: false
+  },
+  deliveryAt: { // تاريخ الرد على الزبون
+    type: Date,
+    default: null
+  },
+  paid: { // اتدفع ولا لا
+    type: Boolean,
+    default: false
+  },
+  paidAt: { // تاريخ دفع الحساب
+    type: Date,
+    default: null
   }
-
 },
 { timestamps: { createdAt: 'created_at' } }
 )
 
 const Order = mongoose.model('orders', Schema)
 
-function validate (product) {
-  const productSchema = Joi.object({
-    barcode: Joi.string().required(),
-    name: Joi.string().required(),
-    price: Joi.string().required(),
-    brand: Joi.string().required(),
-    date: Joi.date().required(),
-    amount: Joi.number()
-  })
-
-  return productSchema.validate(product, { abortEarly: false })
-};
-
-module.exports.validate = validate
 module.exports.Order = Order

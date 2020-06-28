@@ -21,6 +21,7 @@ var makupRouter = require('./routes/makup')
 var medicalRouter = require('./routes/medical')
 var papersRouter = require('./routes/papers')
 var othersRouter = require('./routes/others')
+var orderRouter = require('./routes/order')
 
 var app = express()
 
@@ -72,6 +73,7 @@ app.use('/medical', medicalRouter)
 app.use('/papers', papersRouter)
 app.use('/others', othersRouter)
 app.use('/users', usersRouter)
+app.use('/orders', orderRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
