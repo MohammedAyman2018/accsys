@@ -1,5 +1,5 @@
 const
-  {  User } = require("../models/User_model"),
+  { User } = require("../models/User_model"),
   cloudinary = require('cloudinary').v2,
   bcrypt = require('bcrypt');
 
@@ -72,12 +72,12 @@ exports.add_user = async (req, res) => {
 
   let query = [{ email }];
   if (!!tel) query.push({ tel })
-  
+
   if (!!fbid) query.push({ fbid: fbid })
   else if (!!goid) query.push({ goid: goid })
 
   console.log('query: ', query);
-  
+
   let user = await User.find({ $or: query })
 
   if (user.length > 0) return res.status(400).json({ "msg": "This user existes before" })
@@ -122,25 +122,46 @@ exports.add_user = async (req, res) => {
 
 /** Edit user */
 exports.edit_user = async (req, res) => {
-  if (!req.file) {
-    await User.updateOne({ _id: req.params.id }, { $set: req.body })
-      .then(user => res.json({ success: true }))
-      .catch(err => res.status(404).json({ "msg": err }));
-  } else {
-    let image;
+  if (req.body.password) {
+    let password = req.body.password
+    console.log(password);
+    
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(password, salt, async (err, hash) => {
+        if (err) throw err;
+        password = hash;
 
-    await cloudinary.uploader.upload(req.file.path,
-      { resource_type: "auto", folder: "accsys", public_id: `user-${req.params.id}` },
-      async function (error, result) {
-        /** Uploaded? */
-        if (error) return res.status(400).json(error);
-        /** Create the new product */
-        image = result.url;
-      });
+        delete req.body.password;
+        console.log({ ...req.body, password });
+        
+        await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, password }  }, (err, user) => {
+          if(err) res.status(404).json({ "msg": err })
+          res.json(user)
+        })
+      })
+    })
+  }
+  else {
+    if (!req.file) {
+      await User.updateOne({ _id: req.params.id }, { $set: req.body } )
+        .then(user => res.json(user))
+        .catch(err => res.status(404).json({ "msg": err }));
+    } else {
+      let image;
 
-    await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, image } })
-      .then(user => res.json({ success: true }))
-      .catch(err => res.status(404).json({ "msg": err }));
+      await cloudinary.uploader.upload(req.file.path,
+        { resource_type: "auto", folder: "accsys", public_id: `user-${req.params.id}` },
+        async function (error, result) {
+          /** Uploaded? */
+          if (error) return res.status(400).json(error);
+          /** Create the new product */
+          image = result.url;
+        });
+
+      await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, image } })
+        .then(user => res.json(user))
+        .catch(err => res.status(404).json({ "msg": err }));
+    }
   }
 }
 
@@ -160,7 +181,7 @@ exports.login = async (req, res) => {
       if (!user) return res.status(400).json({ msg: 'User Does not exist' });
 
       if (email) {
-        if(!password) return res.status(400).json({ msg: 'No password provided' })
+        if (!password) return res.status(400).json({ msg: 'No password provided' })
         // Validate password
         bcrypt.compare(password, user.password)
           .then(isMatch => {
@@ -181,7 +202,7 @@ exports.login = async (req, res) => {
  * @param { Response } res
 */
 exports.delete_one = async (req, res) => {
-  await User.deleteOne(req.params.id)
+  await User.findByIdAndDelete(req.params.id)
     .then(user => {
       res.status(200).json({ success: true })
     })
