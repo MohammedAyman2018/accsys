@@ -1,53 +1,50 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+var createError = require('http-errors')
+var express = require('express')
+var path = require('path')
+var cookieParser = require('cookie-parser')
+var logger = require('morgan')
 
+var bodyParser = require('body-parser')
 
-var bodyParser = require('body-parser');
-var path = require('path');
+var mongoose = require('mongoose')
 
-var mongoose = require('mongoose');
-
-const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
-var cors = require('cors');
-require('dotenv').config();
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
+const xss = require('xss-clean')
+// var cors = require('cors')
+require('dotenv').config()
 
 // var index = require('./routes/index');
-var usersRouter = require('./routes/user');
-var cosmaticsRouter = require('./routes/cosmatics');
-var makupRouter = require('./routes/makup');
-var medicalRouter = require('./routes/medical');
-var papersRouter = require('./routes/papers');
-var othersRouter = require('./routes/others');
+var usersRouter = require('./routes/user')
+var cosmaticsRouter = require('./routes/cosmatics')
+var makupRouter = require('./routes/makup')
+var medicalRouter = require('./routes/medical')
+var papersRouter = require('./routes/papers')
+var othersRouter = require('./routes/others')
 
-var app = express();
-
+var app = express()
 
 /** Connect to db */
-async function db() {
+async function db () {
   /**
    *    process.env.db
    *  "mongodb://localhost:27017/system_accountant"
    */
-  await mongoose.connect( process.env.db, {
+  await mongoose.connect(process.env.db, {
     useNewUrlParser: true,
     useFindAndModify: false,
     useCreateIndex: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: true
   })
     .then(() => console.log('connected to the db'))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err))
 };
-db();
+db()
 
 // security
-app.use(mongoSanitize());
-app.use(xss());
-app.use(helmet());
+app.use(mongoSanitize())
+app.use(xss())
+app.use(helmet())
 // var corsOptions = {
 //   origin: 'https://accsys.herokuapp.com',
 //   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
@@ -55,42 +52,41 @@ app.use(helmet());
 
 // app.use(cors(corsOptions));
 
-app.use(bodyParser.json({extended: false}));
-app.use(bodyParser.urlencoded({extended: false}))
-
+app.use(bodyParser.json({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }))
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'jade')
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
+app.use(cookieParser())
+app.use(express.static(path.join(__dirname, 'public')))
 
 // app.use('/', index);
-app.use('/cosmatics', cosmaticsRouter);
-app.use('/makeup', makupRouter);
-app.use('/medical', medicalRouter);
-app.use('/papers', papersRouter);
-app.use('/others', othersRouter);
-app.use('/users', usersRouter);
+app.use('/cosmatics', cosmaticsRouter)
+app.use('/makeup', makupRouter)
+app.use('/medical', medicalRouter)
+app.use('/papers', papersRouter)
+app.use('/others', othersRouter)
+app.use('/users', usersRouter)
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+app.use(function (req, res, next) {
+  next(createError(404))
+})
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'development' ? err : {}
 
   // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+  res.status(err.status || 500)
+  res.render('error')
+})
 
-module.exports = app;
+module.exports = app

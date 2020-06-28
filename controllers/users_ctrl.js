@@ -1,22 +1,22 @@
 const
-  { User } = require("../models/User_model"),
-  cloudinary = require('cloudinary').v2,
-  bcrypt = require('bcrypt');
+  { User } = require('../models/User_model')
+const cloudinary = require('cloudinary').v2
+const bcrypt = require('bcrypt')
 
-require('dotenv');
+require('dotenv')
 
 cloudinary.config({
   cloud_name: process.env.cloudinary_cloud_name,
   api_key: process.env.cloudinary_api_key,
   api_secret: process.env.cloudinary_api_secret
-});
+})
 
 /** Get All Data
  * @param { RequestInfo } req
  * @param { Response } res
  */
 exports.get_all_users = async (req, res) => {
-  res.status(200).json(await User.find({}));
+  res.status(200).json(await User.find({}))
 }
 
 /** Get one user
@@ -28,14 +28,14 @@ exports.get_one_user = async (req, res) => {
 
   let query = {}
 
-  if (tel) query = { tel };
-  else if (email) query = { email };
-  else if (fbid) query = { fbid };
-  else query = { goid };
+  if (tel) query = { tel }
+  else if (email) query = { email }
+  else if (fbid) query = { fbid }
+  else query = { goid }
 
   await User.findOne(query)
     .then(user => res.status(200).json(user))
-    .catch(err => res.status(400).json({ "msg": err }));
+    .catch(err => res.status(400).json({ msg: err }))
 }
 
 /** Add users
@@ -52,9 +52,9 @@ exports.get_one_user = async (req, res) => {
  * @param { Boolean } superAdmin
  */
 exports.add_user = async (req, res) => {
-  if (!(!!req.body.fbid)) delete req.body.fbid;
-  if (!(!!req.body.goid)) delete req.body.goid;
-  if (!(!!req.body.tel)) delete req.body.tel;
+  if (!req.body.fbid) delete req.body.fbid
+  if (!req.body.goid) delete req.body.goid
+  if (!req.body.tel) delete req.body.tel
   // const { error } = validate(req.body);
   // if (error) return res.status(400).json({ "msg": error.details[0].message });
 
@@ -68,134 +68,130 @@ exports.add_user = async (req, res) => {
     fbid,
     goid,
     city
-  } = req.body;
+  } = req.body
 
-  let query = [{ email }];
-  if (!!tel) query.push({ tel })
+  const query = [{ email }]
+  if (tel) query.push({ tel })
 
-  if (!!fbid) query.push({ fbid: fbid })
-  else if (!!goid) query.push({ goid: goid })
+  if (fbid) query.push({ fbid: fbid })
+  else if (goid) query.push({ goid: goid })
 
-  console.log('query: ', query);
+  console.log('query: ', query)
 
   let user = await User.find({ $or: query })
 
-  if (user.length > 0) return res.status(400).json({ "msg": "This user existes before" })
+  if (user.length > 0) return res.status(400).json({ msg: 'This user existes before' })
 
-  user = new User({ name, tel, password, adress, image, email, fbid, goid, city });
+  user = new User({ name, tel, password, adress, image, email, fbid, goid, city })
 
   if (req.file) {
     await cloudinary.uploader.upload(req.file.path,
-      { resource_type: "auto", folder: "accsys", public_id: `user-${user._id}` },
+      { resource_type: 'auto', folder: 'accsys', public_id: `user-${user._id}` },
       async function (error, result) {
         /** Uploaded? */
-        if (error) return res.status(400).json(error);
+        if (error) return res.status(400).json(error)
         /** Create the new product */
-        user.image = result.url;
-      });
+        user.image = result.url
+      })
   }
 
   if (password) {
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(user.password, salt, async (err, hash) => {
-        if (err) throw err;
-        user.password = hash;
+        if (err) throw err
+        user.password = hash
 
         await user.save()
           .then(user => {
-            delete user.password;
-            res.status(200).json(user);
+            delete user.password
+            res.status(200).json(user)
           })
-          .catch(err => res.status(400).json(err));
+          .catch(err => res.status(400).json(err))
       })
     })
   } else {
     await user.save()
       .then(user => {
-        delete user.password;
-        res.status(200).json(user);
+        delete user.password
+        res.status(200).json(user)
       })
-      .catch(err => res.status(400).json(err));
+      .catch(err => res.status(400).json(err))
   }
-
-};
+}
 
 /** Edit user */
 exports.edit_user = async (req, res) => {
   if (req.body.password) {
     let password = req.body.password
-    console.log(password);
-    
+    console.log(password)
+
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, async (err, hash) => {
-        if (err) throw err;
-        password = hash;
+        if (err) throw err
+        password = hash
 
-        delete req.body.password;
-        console.log({ ...req.body, password });
-        
-        await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, password }  }, (err, user) => {
-          if(err) res.status(404).json({ "msg": err })
+        delete req.body.password
+        console.log({ ...req.body, password })
+
+        await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, password } }, (err, user) => {
+          if (err) res.status(404).json({ msg: err })
           res.json(user)
         })
       })
     })
-  }
-  else {
+  } else {
     if (!req.file) {
-      await User.updateOne({ _id: req.params.id }, { $set: req.body } )
+      await User.updateOne({ _id: req.params.id }, { $set: req.body })
         .then(user => res.json(user))
-        .catch(err => res.status(404).json({ "msg": err }));
+        .catch(err => res.status(404).json({ msg: err }))
     } else {
-      let image;
+      let image
 
       await cloudinary.uploader.upload(req.file.path,
-        { resource_type: "auto", folder: "accsys", public_id: `user-${req.params.id}` },
+        { resource_type: 'auto', folder: 'accsys', public_id: `user-${req.params.id}` },
         async function (error, result) {
           /** Uploaded? */
-          if (error) return res.status(400).json(error);
+          if (error) return res.status(400).json(error)
           /** Create the new product */
-          image = result.url;
-        });
+          image = result.url
+        })
 
       await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, image } })
         .then(user => res.json(user))
-        .catch(err => res.status(404).json({ "msg": err }));
+        .catch(err => res.status(404).json({ msg: err }))
     }
   }
 }
 
 exports.login = async (req, res) => {
-  const { email, password, fbid, goid, tel } = req.body;
+  const { email, password, fbid, goid, tel } = req.body
 
-
-  let query;
+  let query
   if (tel) query = { tel }
   else if (email) query = { email }
-  else if (fbid) query = { fbid };
-  else query = { goid };
+  else if (fbid) query = { fbid }
+  else query = { goid }
 
   // Check for existing user
   await User.findOne(query)
     .then(user => {
-      if (!user) return res.status(400).json({ msg: 'User Does not exist' });
+      if (!user) return res.status(400).json({ msg: 'User Does not exist' })
 
       if (email) {
         if (!password) return res.status(400).json({ msg: 'No password provided' })
         // Validate password
         bcrypt.compare(password, user.password)
           .then(isMatch => {
-            if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
-            delete user.password;
-            res.status(200).json(user);
+            if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' })
+            delete user.password
+            res.status(200).json(user)
           })
       } else {
-        delete user.password;
-        res.status(200).json(user);
+        delete user.password
+        res.status(200).json(user)
       }
     })
 }
-
 
 /** Delete user
  * @param { RequestInfo } req
@@ -206,8 +202,7 @@ exports.delete_one = async (req, res) => {
     .then(user => {
       res.status(200).json({ success: true })
     })
-    .catch(err => res.status(404).json({ "msg": err.message }));
-
+    .catch(err => res.status(404).json({ msg: err.message }))
 }
 
 /** Delete All
@@ -216,10 +211,9 @@ exports.delete_one = async (req, res) => {
 */
 exports.delete_all = async (req, res) => {
   try {
-    await User.deleteMany({});
-    res.status(200).json({ "msg": "done" });
-
+    await User.deleteMany({})
+    res.status(200).json({ msg: 'done' })
   } catch (error) {
-    res.status(200).json(error);
+    res.status(200).json(error)
   }
 }

@@ -1,19 +1,16 @@
-const mongoose = require('mongoose');
-const Joi = require('@hapi/joi');
-const { array } = require('@hapi/joi');
-
+const mongoose = require('mongoose')
 
 const Schema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    required: true
   },
   password: {
-    type: String,
+    type: String
   },
 
   tel: {
-    type: String,
+    type: String
   },
   email: {
     type: String,
@@ -21,11 +18,11 @@ const Schema = new mongoose.Schema({
   },
   fbid: String,
   goid: String,
-  
+
   adress: String,
   image: String,
   city: String,
-  
+
   fav: [String],
   admin: {
     type: Boolean,
@@ -36,30 +33,10 @@ const Schema = new mongoose.Schema({
     default: false
   }
 },
-  { timestamps: { createdAt: 'created_at' } }
-);
+{ timestamps: { createdAt: 'created_at' } }
+)
 
-let User = mongoose.model('users', Schema);
+const User = mongoose.model('users', Schema)
 
-// function validate(user) {
-//   const userSchema = Joi.object({
-//     name: Joi.string().required(),
-//     password: Joi.string(),
-//     tel: Joi.string(),
-//     adress: Joi.string(),
-//     email: Joi.string().email(),
-//     fbid: Joi.string().allow('').allow(null).min(0),
-//     goid: Joi.string().allow('').allow(null).min(0),
-//     city: Joi.string(),
-//     admin: Joi.boolean(),
-//     image: Joi.allow(null).optional(),
-//     fav: Joi.array(),
-//     superAdmin: Joi.boolean()
-//   });
-
-//   return userSchema.validate(user, { abortEarly: false });
-// };
-
-
-// module.exports.validate = validate;
-module.exports.User = User;
+module.exports.UserSchema = Schema
+module.exports.User = User

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const Joi = require('@hapi/joi');
+const mongoose = require('mongoose')
+const Joi = require('@hapi/joi')
 
 const Schema = new mongoose.Schema({
   barcode: {
@@ -14,38 +14,37 @@ const Schema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
+    required: true
   },
   brand: {
     type: String,
-    required: true,
+    required: true
   },
   image: {
     type: String,
-    required: true,
+    required: true
   },
   date: {
     type: Date,
     default: null,
-    required: true,
+    required: true
   },
   amount: {
     type: Number,
-    default: 0,
+    default: 0
   }
 },
-  { timestamps: { createdAt: 'created_at' } }
-);
+{ timestamps: { createdAt: 'created_at' } }
+)
 
-let Cosmatics = mongoose.model('Cosmatics', Schema);
-let Makups = mongoose.model('Makups', Schema);
+const Cosmatics = mongoose.model('Cosmatics', Schema)
+const Makups = mongoose.model('Makups', Schema)
 
-let Medical = mongoose.model('medical', Schema);
-let Papers = mongoose.model('papers', Schema);
-let Others = mongoose.model('others', Schema);
+const Medical = mongoose.model('medical', Schema)
+const Papers = mongoose.model('papers', Schema)
+const Others = mongoose.model('others', Schema)
 
-
-function validate(product) {
+function validate (product) {
   const productSchema = Joi.object({
     barcode: Joi.string().required(),
     name: Joi.string().required(),
@@ -53,12 +52,12 @@ function validate(product) {
     brand: Joi.string().required(),
     date: Joi.date().required(),
     amount: Joi.number()
-  });
+  })
 
-  return productSchema.validate(product, { abortEarly: false });
+  return productSchema.validate(product, { abortEarly: false })
 };
 
-function validateUpdate(product) {
+function validateUpdate (product) {
   const productSchema = Joi.object({
     brand: Joi.string().required(),
     name: Joi.string().required(),
@@ -67,15 +66,17 @@ function validateUpdate(product) {
     new_barcode: Joi.string(),
     date: Joi.date().required(),
     amount: Joi.number()
-  });
+  })
 
-  return productSchema.validate(product, { abortEarly: false });
+  return productSchema.validate(product, { abortEarly: false })
 };
-module.exports.validate = validate;
-module.exports.validateUpdate = validateUpdate;
+module.exports.validate = validate
+module.exports.validateUpdate = validateUpdate
 
-module.exports.Cosmatics = Cosmatics;
-module.exports.Makups = Makups;
-module.exports.Medical = Medical;
-module.exports.Papers = Papers;
-module.exports.Others = Others;
+module.exports.ProductSchema = Schema
+
+module.exports.Cosmatics = Cosmatics
+module.exports.Makups = Makups
+module.exports.Medical = Medical
+module.exports.Papers = Papers
+module.exports.Others = Others

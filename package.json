@@ -8,7 +8,9 @@
     "dev": "nodemon",
     "stop": "taskkill -f -im node.exe",
     "commit": "git add . && git commit -m",
-    "deploy": "git push heroku master && git push origin master"
+    "deploy": "git push heroku master && git push origin master",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "cookie-parser": "~1.4.4",
@@ -31,5 +33,13 @@
     "multer": "^1.4.2",
     "node-sass-middleware": "^0.11.0",
     "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^7.3.1",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
   }
 }
