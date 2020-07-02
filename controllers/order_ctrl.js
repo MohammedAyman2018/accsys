@@ -51,10 +51,8 @@ exports.editOrder = async (req, res) => {
  * @param { String } id Order _id
 */
 exports.deleteOne = async (req, res) => {
-  await Order.findByIdAndDelete(req.params.id)
-    .then(user => {
-      res.status(200).json({ success: true })
-    })
+  await Order.deleteOne({ _id: req.params.id })
+    .then(order => res.status(200).json(order))
     .catch(err => res.status(404).json({ msg: err.message }))
 }
 

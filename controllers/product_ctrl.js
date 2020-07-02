@@ -202,14 +202,10 @@ exports.editProductAmount = async (req, res, theClass) => {
  * @param { String } barcode
 */
 exports.deleteOne = async (req, res, theClass) => {
-  const id = req.params.id
-  /** Get the product and update it */
-  await theClass.findOneAndDelete({ id }, (err, product) => {
-    if (err) res.status(400).json({ success: false })
-    // cloudinary.uploader.destroy(public_id, options, callback);
-
-    res.status(200).json({ msg: 'Deleted Successfuly' })
-  })
+  const barcode = req.params.barcode
+  await theClass.delete9One({ barcode: barcode })
+    .then(result => res.status(200).json(result))
+    .catch(err => res.status(400).json({ success: false }))
 }
 
 /** Delete All

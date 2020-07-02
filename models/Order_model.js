@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 // const Joi = require('@hapi/joi')
-const { UserSchema } = require('../models/User_model')
+// const { UserSchema } = require('../models/User_model')
 
 const Schema = new mongoose.Schema({
   by: { // الاوردر لمين
-    type: UserSchema,
+    type: Object,
     required: true
   },
   products: { // المنتجات و كميتها

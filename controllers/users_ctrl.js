@@ -121,7 +121,7 @@ exports.addUser = async (req, res) => {
 
 /** Edit user */
 exports.editUser = async (req, res) => {
-  if (req.body.password) {
+  if (!!req.body.password && req.body.password != null) {
     let password = req.body.password
     console.log(password)
 
@@ -198,10 +198,8 @@ exports.login = async (req, res) => {
  * @param { Response } res
 */
 exports.deleteOne = async (req, res) => {
-  await User.findByIdAndDelete(req.params.id)
-    .then(user => {
-      res.status(200).json({ success: true })
-    })
+  await User.deleteOne({ _id: req.params.id })
+    .then(result => res.status(200).json(result))
     .catch(err => res.status(404).json({ msg: err.message }))
 }
 
