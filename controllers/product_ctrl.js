@@ -203,7 +203,7 @@ exports.editProductAmount = async (req, res, theClass) => {
 */
 exports.deleteOne = async (req, res, theClass) => {
   const barcode = req.params.barcode
-  await theClass.delete9One({ barcode: barcode })
+  await theClass.deleteOne({ barcode: barcode })
     .then(result => res.status(200).json(result))
     .catch(err => res.status(400).json({ success: false }))
 }

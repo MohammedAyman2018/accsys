@@ -13,12 +13,12 @@ exports.getOneOrder = async (req, res) => {
 }
 
 exports.addOrder = async (req, res) => {
-  const { by, products } = req.body
+  const { by, products, total } = req.body
   if (!by || !products) return res.status(400).json({ msg: 'There is missing data' })
   await Order.findOne({ 'by.email': by.email })
     .then(async existingOrder => {
       if (!existingOrder || existingOrder.delivery) {
-        const order = new Order({ by, products })
+        const order = new Order({ by, products, total })
         await order.save()
           .then(order => res.status(200).json(order))
           .catch(err => res.status(400).json(err))
