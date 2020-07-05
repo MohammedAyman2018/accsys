@@ -9,7 +9,7 @@ const controller = require('../controllers/users_ctrl')
 router.get('/all', async (req, res) => controller.getAllUsers(req, res))
 
 /** Get one user */
-router.get('/one', async (req, res) => controller.getOneUser(req, res))
+router.get('/:id', async (req, res) => controller.getOneUser(req, res))
 
 /** Add user */
 router.post('/', upload.single('image'), (req, res) => controller.addUser(req, res))

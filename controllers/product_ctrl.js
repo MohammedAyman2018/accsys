@@ -131,25 +131,19 @@ exports.editProduct = async (req, res, theClass) => {
   console.log(req.body)
 
   /** Check For Errors */
-  const { error } = validateUpdate(req.body)
+  const { error } = validate(req.body)
   if (error) return res.status(400).json(error)
 
   /** Get req.body */
-  const { newBarcode, oldBarcode, name, price, brand, date, amount } = req.body
-
-  /** Check if the new oldBarcode is existed before */
-  if (newBarcode) {
-    const existedBefore = await theClass.findOne({ barcode: newBarcode })
-    if (existedBefore) return res.status(400).json({ msg: 'newBarcode existed Before' })
-  };
+  const { barcode, name, price, brand, date, amount } = req.body
 
   /** Get Product */
-  await theClass.findOne({ barcode: oldBarcode })
+  await theClass.findOne({ barcode })
     .then(async product => {
-      if (!product) return res.status(400).json({ msg: 'There is No product with this oldBarcode' })
+      if (!product) return res.status(400).json({ msg: 'There is No product with this barcode' })
 
       const update = {
-        barcode: (newBarcode) || oldBarcode,
+        barcode,
         name,
         price,
         brand,
@@ -169,7 +163,7 @@ exports.editProduct = async (req, res, theClass) => {
       }
 
       /** Get the product and update it */
-      await theClass.findOneAndUpdate({ barcode: oldBarcode }, { $set: update }, { new: true }, (err, product) => {
+      await theClass.findOneAndUpdate({ barcode }, { $set: update }, { new: true }, (err, product) => {
         if (err) res.status(400).json({ success: false })
         res.status(200).json(product)
       })

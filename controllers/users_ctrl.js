@@ -24,18 +24,9 @@ exports.getAllUsers = async (req, res) => {
  * @param { Response } res
  */
 exports.getOneUser = async (req, res) => {
-  const { tel, email, fbid, goid } = req.body
-
-  let query = {}
-
-  if (tel) query = { tel }
-  else if (email) query = { email }
-  else if (fbid) query = { fbid }
-  else query = { goid }
-
-  await User.findOne(query)
-    .then(user => res.status(200).json(user))
-    .catch(err => res.status(400).json({ msg: err }))
+  await User.findById(req.params.id)
+    .then(user => res.json(200).json(user))
+    .catch(err => res.status(400).json(err))
 }
 
 /** Add users
@@ -177,7 +168,7 @@ exports.login = async (req, res) => {
     .then(user => {
       if (!user) return res.status(400).json({ msg: 'User Does not exist' })
 
-      if (email) {
+      if (email && (!goid || !fbid)) {
         if (!password) return res.status(400).json({ msg: 'No password provided' })
         // Validate password
         bcrypt.compare(password, user.password)
