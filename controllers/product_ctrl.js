@@ -1,5 +1,5 @@
 const
-  { validate, validateUpdate } = require('../models/Product_model')
+  { validate } = require('../models/Product_model')
 const cloudinary = require('cloudinary').v2
 require('dotenv')
 
