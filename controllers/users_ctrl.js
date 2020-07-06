@@ -124,17 +124,19 @@ exports.editUser = async (req, res) => {
         delete req.body.password
         console.log({ ...req.body, password })
 
-        await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, password } }, (err, user) => {
-          if (err) res.status(404).json({ msg: err })
-          res.json(user)
+        /** Get the product and update it */
+        await User.findOneAndUpdate({ _id: req.params.id }, { $set: { ...req.body, password } }, { new: true }, (err, user) => {
+          if (err) res.status(400).json(err)
+          res.status(200).json(user)
         })
-      })
+      }).catch(err => res.status(400).json({ msg: err.message }))
     })
   } else {
     if (!req.file) {
-      await User.updateOne({ _id: req.params.id }, { $set: req.body })
-        .then(user => res.json(user))
-        .catch(err => res.status(404).json({ msg: err }))
+      await User.findOneAndUpdate({ _id: req.params.id }, { $set: req.body }, { new: true }, (err, user) => {
+        if (err) res.status(400).json(err)
+        res.status(200).json(user)
+      })
     } else {
       let image
 
@@ -147,9 +149,10 @@ exports.editUser = async (req, res) => {
           image = result.url
         })
 
-      await User.updateOne({ _id: req.params.id }, { $set: { ...req.body, image } })
-        .then(user => res.json(user))
-        .catch(err => res.status(404).json({ msg: err }))
+      await User.findOneAndUpdate({ _id: req.params.id }, { $set: { ...req.body, image } }, { new: true }, (err, user) => {
+        if (err) res.status(400).json(err)
+        res.status(200).json(user)
+      })
     }
   }
 }
