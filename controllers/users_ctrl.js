@@ -25,7 +25,7 @@ exports.getAllUsers = async (req, res) => {
  */
 exports.getOneUser = async (req, res) => {
   await User.findById(req.params.id)
-    .then(user => res.json(200).json(user))
+    .then(user => res.status(200).json(user))
     .catch(err => res.status(400).json(err))
 }
 
