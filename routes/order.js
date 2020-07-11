@@ -3,8 +3,8 @@ var router = express.Router()
 
 const controller = require('../controllers/order_ctrl')
 
-router.get('/all', controller.getAllOrders)
-router.get('/:id', controller.getAllOrders)
+router.get('/', controller.getAllOrders)
+router.get('/:id', controller.getOneOrder)
 
 router.post('/', controller.addOrder)
 router.patch('/:id', controller.editOrder)
