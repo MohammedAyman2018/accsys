@@ -21,13 +21,14 @@ exports.addOrder = async (req, res) => {
         const order = new Order({ by, products, total })
         await order.save()
           .then(order => res.status(200).json(order))
-          .catch(err => res.status(400).json(err))
+          .catch(err => res.status(400).json(err.message))
       } else {
         // res.send(existingOrder)
         existingOrder.products.push(...products)
+        existingOrder.total.push(...total)
         await existingOrder.save()
           .then(order => res.status(200).json(order))
-          .catch(err => res.status(400).json(err))
+          .catch(err => res.status(400).json(err.message))
       }
     })
 }

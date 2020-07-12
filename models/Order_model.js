@@ -11,7 +11,7 @@ const Schema = new mongoose.Schema({
     type: [Object],
     required: true
   },
-  total: Number,
+  total: [Number],
   delivery: { // رد على الزبون ولا لا
     type: Boolean,
     default: false

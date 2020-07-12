@@ -1,7 +1,6 @@
 var createError = require('http-errors')
 var express = require('express')
 var path = require('path')
-var cookieParser = require('cookie-parser')
 var logger = require('morgan')
 
 var bodyParser = require('body-parser')
@@ -25,6 +24,9 @@ var orderRouter = require('./routes/order')
 
 var app = express()
 
+var server = require('http').createServer(app)
+var io = require('socket.io')(server)
+
 /** Connect to db */
 async function db () {
   /**
@@ -39,6 +41,16 @@ async function db () {
   })
     .then(() => console.log('connected to the db'))
     .catch((err) => console.log(err))
+
+  const conn = await mongoose.createConnection(process.env.db, {
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+  })
+  conn.watch().on('change', data => {
+    io.send('HI')
+  })
 };
 db()
 
@@ -63,7 +75,6 @@ app.set('view engine', 'jade')
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // app.use('/', index);
