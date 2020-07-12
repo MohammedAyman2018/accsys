@@ -3,12 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node app",
     "fast": "git add . && git commit -m \"deploy bug\" &&  git push origin master",
-    "dev": "nodemon",
+    "dev": "nodemon app",
     "stop": "taskkill -f -im node.exe",
     "commit": "git add . && git commit -m",
-    "deploy": "git push heroku master && git push origin master",
+    "deploy": "git push heroku master",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },

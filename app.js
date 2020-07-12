@@ -24,8 +24,19 @@ var orderRouter = require('./routes/order')
 
 var app = express()
 
-var server = require('http').createServer(app)
-var io = require('socket.io')(server)
+var http = require('http').createServer(app)
+var io = require('socket.io')(http)
+
+const EventEmitter = require('events')
+class MyEmitter extends EventEmitter {}
+const myEmitter = new MyEmitter()
+
+io.on('connection', (socket) => {
+  console.log('HI IM CONNECTED')
+  socket.on('dbchanged', (data) => {
+    console.log('LOL IM WIRKING')
+  })
+})
 
 /** Connect to db */
 async function db () {
@@ -49,8 +60,8 @@ async function db () {
     useUnifiedTopology: true
   })
   conn.watch().on('change', data => {
-    console.log('data on change in db', data)
-    io.emit('first', 'HI')
+    // Dispatch the event.
+    myEmitter.emit('dbchanged')
   })
 };
 db()
@@ -103,4 +114,8 @@ app.use(function (err, req, res, next) {
   res.render('error')
 })
 
-module.exports = app
+const port = process.env.PORT || 3000
+
+http.listen(port, () => {
+  console.log('listening on *:3000')
+})
