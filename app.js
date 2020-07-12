@@ -49,7 +49,8 @@ async function db () {
     useUnifiedTopology: true
   })
   conn.watch().on('change', data => {
-    io.send('HI')
+    console.log('data on change in db', data)
+    io.emit('first', 'HI')
   })
 };
 db()
