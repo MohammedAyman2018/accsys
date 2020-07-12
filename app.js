@@ -34,7 +34,7 @@ const myEmitter = new MyEmitter()
 io.on('connection', (socket) => {
   console.log('HI IM CONNECTED')
   socket.on('dbchanged', (data) => {
-    console.log('LOL IM WIRKING')
+    socket.emit('yapa', 'hello ya LOL')
   })
 })
 
