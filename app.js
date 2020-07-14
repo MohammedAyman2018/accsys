@@ -33,15 +33,17 @@ const myEmitter = new MyEmitter()
 
 io.on('connection', (socket) => {
   console.log('HI IM CONNECTED')
+
   socket.on('dbchanged', (data) => {
-    io.emit('yapa', 'hello ya LOL')
+    console.log('SomeOne did something')
+    io.emit('yapa', data)
   })
 })
 
 /** Connect to db */
 async function db () {
   /**
-   *    process.env.db
+   *  process.env.db
    *  "mongodb://localhost:27017/system_accountant"
    */
   await mongoose.connect(process.env.db, {
@@ -116,6 +118,4 @@ app.use(function (err, req, res, next) {
 
 const port = process.env.PORT || 3000
 
-http.listen(port, () => {
-  console.log('listening on *:3000')
-})
+http.listen(port, () => console.log('listening on *:3000'))
