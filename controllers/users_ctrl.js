@@ -2,6 +2,7 @@ const
   { User } = require('../models/User_model')
 const cloudinary = require('cloudinary').v2
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 require('dotenv')
 
@@ -46,8 +47,6 @@ exports.addUser = async (req, res) => {
   if (!req.body.fbid) delete req.body.fbid
   if (!req.body.goid) delete req.body.goid
   if (!req.body.tel) delete req.body.tel
-  // const { error } = validate(req.body);
-  // if (error) return res.status(400).json({ "msg": error.details[0].message });
 
   const {
     name,
@@ -177,12 +176,37 @@ exports.login = async (req, res) => {
         bcrypt.compare(password, user.password)
           .then(isMatch => {
             if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' })
+
+            let token
+            if (user.admin || user.superAdmin) {
+              token = jwt.sign(
+                {
+                  name: user.name,
+                  email: user.email,
+                  _id: user._id,
+                  admin: user.admin,
+                  superAdmin: user.superAdmin
+                }, process.env.jwtSecret)
+            }
+
             delete user.password
-            res.status(200).json(user)
+            res.status(200).json({ token, user })
           })
       } else {
+        let token
+        if (user.admin || user.superAdmin) {
+          token = jwt.sign(
+            {
+              name: user.name,
+              email: user.email,
+              _id: user._id,
+              admin: user.admin,
+              superAdmin: user.superAdmin
+            }, process.env.jwtSecret)
+        }
+
         delete user.password
-        res.status(200).json(user)
+        res.status(200).json({ token, user })
       }
     })
 }

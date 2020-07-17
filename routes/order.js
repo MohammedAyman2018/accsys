@@ -2,14 +2,15 @@ var express = require('express')
 var router = express.Router()
 
 const controller = require('../controllers/order_ctrl')
+const auth = require('../middlewares/auth')
 
-router.get('/', controller.getAllOrders)
-router.get('/:id', controller.getOneOrder)
+router.get('/', auth, controller.getAllOrders)
+router.get('/:id', auth, controller.getOneOrder)
 
-router.post('/', controller.addOrder)
-router.patch('/:id', controller.editOrder)
+router.post('/', auth, controller.addOrder)
+router.patch('/:id', auth, controller.editOrder)
 
-router.delete('/:id', controller.deleteOne)
-router.delete('/orders/all', controller.deleteAll)
+router.delete('/:id', auth, controller.deleteOne)
+router.delete('/orders/all', auth, controller.deleteAll)
 
 module.exports = router
