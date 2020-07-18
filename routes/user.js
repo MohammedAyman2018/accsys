@@ -7,7 +7,7 @@ const controller = require('../controllers/users_ctrl')
 const auth = require('../middlewares/auth')
 
 /** Get All Users */
-router.get('/all', async (req, res) => controller.getAllUsers(req, res))
+router.get('/all', auth, async (req, res) => controller.getAllUsers(req, res))
 
 /** Get one user */
 router.get('/:id', async (req, res) => controller.getOneUser(req, res))

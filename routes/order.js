@@ -10,7 +10,7 @@ router.get('/:id', auth, controller.getOneOrder)
 router.post('/', auth, controller.addOrder)
 router.patch('/:id', auth, controller.editOrder)
 
-router.delete('/:id', auth, controller.deleteOne)
+router.delete('/:id', controller.deleteOne)
 router.delete('/orders/all', auth, controller.deleteAll)
 
 module.exports = router

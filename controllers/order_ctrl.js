@@ -39,7 +39,6 @@ exports.editOrder = async (req, res) => {
     .then(async order => {
       if (!order) res.status(400).json({ msg: 'Order Not Found' })
       // eslint-disable-next-line no-extra-boolean-cast
-      else if ((typeof req.body.paid !== 'boolean' && order.delivery === true)) res.status(400).json({ msg: 'You can\'t edit this order because it\'s in delivery' })
       else {
         await Order.updateOne({ _id: req.params.id }, { $set: { ...req.body } }, (err, order) => {
           if (err) res.status(404).json({ msg: err })
