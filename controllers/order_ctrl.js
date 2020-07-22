@@ -38,7 +38,6 @@ exports.editOrder = async (req, res) => {
   await Order.findById(req.params.id)
     .then(async order => {
       if (!order) res.status(400).json({ msg: 'Order Not Found' })
-      // eslint-disable-next-line no-extra-boolean-cast
       else {
         await Order.updateOne({ _id: req.params.id }, { $set: { ...req.body } }, (err, order) => {
           if (err) res.status(404).json({ msg: err })

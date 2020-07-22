@@ -27,10 +27,6 @@ var app = express()
 var http = require('http').createServer(app)
 var io = require('socket.io')(http)
 
-const EventEmitter = require('events')
-class MyEmitter extends EventEmitter {}
-const myEmitter = new MyEmitter()
-
 io.on('connection', (socket) => {
   console.log('HI IM CONNECTED')
 
@@ -54,17 +50,6 @@ async function db () {
   })
     .then(() => console.log('connected to the db'))
     .catch((err) => console.log(err))
-
-  const conn = await mongoose.createConnection(process.env.db, {
-    useNewUrlParser: true,
-    useFindAndModify: false,
-    useCreateIndex: true,
-    useUnifiedTopology: true
-  })
-  conn.watch().on('change', data => {
-    // Dispatch the event.
-    myEmitter.emit('dbchanged')
-  })
 };
 db()
 
