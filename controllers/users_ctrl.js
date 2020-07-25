@@ -113,22 +113,20 @@ exports.addUser = async (req, res) => {
 exports.editUser = async (req, res) => {
   if (!!req.body.password && req.body.password != null) {
     let password = req.body.password
-    console.log(password)
 
     bcrypt.genSalt(10, (err, salt) => {
       bcrypt.hash(password, salt, async (err, hash) => {
-        if (err) throw err
+        if (err) res.status(400).json(err.message)
         password = hash
 
         delete req.body.password
-        console.log({ ...req.body, password })
 
         /** Get the product and update it */
-        await User.findOneAndUpdate({ _id: req.params.id }, { $set: { ...req.body, password } }, { new: true }, (err, user) => {
+        await User.findOneAndUpdate({ _id: req.params.id }, { $set: { password } }, { new: true }, (err, user) => {
           if (err) res.status(400).json(err)
           res.status(200).json(user)
         })
-      }).catch(err => res.status(400).json({ msg: err.message }))
+      })
     })
   } else {
     if (!req.file) {
