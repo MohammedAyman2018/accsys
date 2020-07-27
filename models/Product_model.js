@@ -44,6 +44,8 @@ const Medical = mongoose.model('medical', Schema)
 const Papers = mongoose.model('papers', Schema)
 const Others = mongoose.model('others', Schema)
 
+const allProducts = mongoose.model('all', Schema)
+
 function validate (product) {
   const productSchema = Joi.object({
     barcode: Joi.string().required(),
@@ -80,3 +82,4 @@ module.exports.Makups = Makups
 module.exports.Medical = Medical
 module.exports.Papers = Papers
 module.exports.Others = Others
+module.exports.allProducts = allProducts
