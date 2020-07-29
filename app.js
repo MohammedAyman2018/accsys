@@ -15,13 +15,8 @@ require('dotenv').config()
 
 // var index = require('./routes/index');
 var usersRouter = require('./routes/user')
-var cosmaticsRouter = require('./routes/cosmatics')
-var makupRouter = require('./routes/makup')
-var medicalRouter = require('./routes/medical')
-var papersRouter = require('./routes/papers')
-var othersRouter = require('./routes/others')
+var productsRouter = require('./routes/products')
 var orderRouter = require('./routes/order')
-var allRouter = require('./routes/all')
 
 var app = express()
 
@@ -78,14 +73,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use(express.static(path.join(__dirname, 'public')))
 
 // app.use('/', index);
-app.use('/cosmatics', cosmaticsRouter)
-app.use('/makeup', makupRouter)
-app.use('/medical', medicalRouter)
-app.use('/papers', papersRouter)
-app.use('/others', othersRouter)
 app.use('/users', usersRouter)
 app.use('/orders', orderRouter)
-app.use('/all-products', allRouter)
+app.use('/product', productsRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

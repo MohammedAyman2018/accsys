@@ -32,19 +32,15 @@ const Schema = new mongoose.Schema({
   amount: {
     type: Number,
     default: 0
+  },
+  collectionName: {
+    type: String,
+    required: true
   }
 },
 { timestamps: { createdAt: 'created_at' } }
 )
-
-const Cosmatics = mongoose.model('Cosmatics', Schema)
-const Makups = mongoose.model('Makups', Schema)
-
-const Medical = mongoose.model('medical', Schema)
-const Papers = mongoose.model('papers', Schema)
-const Others = mongoose.model('others', Schema)
-
-const allProducts = mongoose.model('all', Schema)
+const products = mongoose.model('products', Schema)
 
 function validate (product) {
   const productSchema = Joi.object({
@@ -77,9 +73,4 @@ module.exports.validateUpdate = validateUpdate
 
 module.exports.ProductSchema = Schema
 
-module.exports.Cosmatics = Cosmatics
-module.exports.Makups = Makups
-module.exports.Medical = Medical
-module.exports.Papers = Papers
-module.exports.Others = Others
-module.exports.allProducts = allProducts
+module.exports.Product = products

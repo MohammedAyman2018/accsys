@@ -1,19 +1,14 @@
-const
-  { validate } = require('../models/Product_model')
-const cloudinary = require('cloudinary').v2
+const { validate, Product } = require('../models/Product_model')
+const { cloudinary } = require('../middlewares/upload')
 require('dotenv')
-
-cloudinary.config({
-  cloud_name: process.env.cloudinary_cloud_name,
-  api_key: process.env.cloudinary_api_key,
-  api_secret: process.env.cloudinary_api_secret
-})
 
 /** Get All Data
  * @returns { object } All products
  */
-exports.getAllProducts = async (req, res, theClass) => {
-  await theClass.find({})
+exports.getAllProducts = async (req, res) => {
+  const collectionName = req.params.collection
+  console.log(collectionName)
+  await Product.find({ collectionName })
     .then(products => res.status(200).json(products))
     .catch(err => res.status(200).json(err))
 }
@@ -22,16 +17,17 @@ exports.getAllProducts = async (req, res, theClass) => {
  * @param { Number } page The page number
  * @returns { object } All products
  */
-exports.getWithPagenation = async (req, res, theClass) => {
-  var perPage = 9
-  var page = req.params.page || 1
+exports.getWithPagenation = async (req, res) => {
+  const perPage = 9
+  const page = req.params.page || 1
+  const collectionName = req.params.collection
 
-  await theClass
-    .find({})
+  await Product
+    .find({ collectionName })
     .skip((perPage * page) - perPage)
     .limit(perPage)
     .exec(async (err, products) => {
-      await theClass.countDocuments().exec(function (err, count) {
+      await Product.countDocuments().exec(function (err, count) {
         if (err) return res.status(200).json({ msg: err })
         res.status(200).json({
           products: products,
@@ -46,13 +42,15 @@ exports.getWithPagenation = async (req, res, theClass) => {
  * @param { Number } barcode
  * @returns { object } The product
  */
-exports.getOneProduct = async (req, res, theClass) => {
-  await theClass.findOne({ barcode: req.params.barcode })
+exports.getOneProduct = async (req, res) => {
+  const collectionName = req.params.collection
+
+  await Product.findOne({ collectionName, barcode: req.params.barcode })
     .then(async product => {
       if (!product) return res.status(400).json({ msg: 'There is no product.' })
       res.status(200).json({
         product: product,
-        samilier: await theClass.find({ brand: product.brand }).limit(9)
+        samilier: await Product.find({ brand: product.brand }).limit(9)
       })
     })
     .catch(err => {
@@ -64,23 +62,24 @@ exports.getOneProduct = async (req, res, theClass) => {
 /** Filter
  * @param { String } name
  * @param { String } barcode
- * @param { ClassDecorator } theClass
+ * @param { ClassDecorator } Product
  */
-exports.filter = async (req, res, theClass) => {
+exports.filter = async (req, res) => {
   const { name, barcode } = req.body
+  const collectionName = req.params.collection
 
   if (name && !barcode) {
     const reg = new RegExp(`^${name}`)
-    await theClass.find({ name: { $regex: reg } })
+    await Product.find({ collectionName, name: { $regex: reg } })
       .then(products => res.status(200).json(products))
       .catch(err => res.status(400).json({ msg: err.message }))
   } else if (!name && barcode) {
     const reg = new RegExp(`^${barcode}`)
-    await theClass.find({ barcode: { $regex: reg } })
+    await Product.find({ collectionName, barcode: { $regex: reg } })
       .then(products => res.status(200).json(products))
       .catch(err => res.status(400).json({ msg: err.message }))
   } else {
-    await theClass.find({ barcode: barcode, name: name })
+    await Product.find({ collectionName, barcode: barcode, name: name })
       .then(products => res.status(200).json(products))
       .catch(err => res.status(400).json({ msg: err.message }))
   }
@@ -89,9 +88,9 @@ exports.filter = async (req, res, theClass) => {
 /** Add Products
  * @param { RequestInfo } req
  * @param { Response } res
- * @param { ClassDecorator } theClass
+ * @param { ClassDecorator } Product
  */
-exports.addProduct = async (req, res, theClass) => {
+exports.addProduct = async (req, res) => {
   console.log(req.body)
 
   /** Check For Errors */
@@ -99,10 +98,11 @@ exports.addProduct = async (req, res, theClass) => {
   if (error) return res.status(400).json(error)
 
   /** Get req.body */
+  const collectionName = req.params.collection
   const { barcode, name, price, brand, date, amount } = req.body
 
   /** Check if the barcaode exists before */
-  await theClass.findOne({ barcode: barcode })
+  await Product.findOne({ barcode: barcode })
     .then(async productWithSameBarcode => {
       /** Existed */
       if (productWithSameBarcode) return res.status(400).json({ msg: 'existed Before' })
@@ -115,7 +115,7 @@ exports.addProduct = async (req, res, theClass) => {
             /** Uploaded? */
             if (error) return res.status(400).json(error)
             /** Create the new product */
-            product = Reflect.construct(theClass, [{ barcode, name, price, brand, image: result.url, date, amount }])
+            product = new Product({ barcode, name, price, brand, image: result.url, collectionName, date, amount })
 
             /** Save the new product */
             await product.save()
@@ -127,7 +127,7 @@ exports.addProduct = async (req, res, theClass) => {
 }
 
 /** Edit Product */
-exports.editProduct = async (req, res, theClass) => {
+exports.editProduct = async (req, res) => {
   console.log(req.body)
 
   /** Check For Errors */
@@ -135,10 +135,11 @@ exports.editProduct = async (req, res, theClass) => {
   if (error) return res.status(400).json(error)
 
   /** Get req.body */
+  const collectionName = req.params.collection
   const { barcode, name, price, brand, date, amount } = req.body
 
   /** Get Product */
-  await theClass.findOne({ barcode })
+  await Product.findOne({ barcode })
     .then(async product => {
       if (!product) return res.status(400).json({ msg: 'There is No product with this barcode' })
 
@@ -148,6 +149,7 @@ exports.editProduct = async (req, res, theClass) => {
         price,
         brand,
         image: product.image,
+        collectionName,
         date,
         amount
       }
@@ -162,8 +164,12 @@ exports.editProduct = async (req, res, theClass) => {
           })
       }
 
+      if (req.body.collectionName) {
+        update.collectionName = req.body.collectionName
+      }
+
       /** Get the product and update it */
-      await theClass.findOneAndUpdate({ barcode }, { $set: update }, { new: true }, (err, product) => {
+      await Product.findOneAndUpdate({ collectionName: update.collectionName, barcode }, { $set: update }, { new: true }, (err, product) => {
         if (err) res.status(400).json({ success: false })
         res.status(200).json(product)
       })
@@ -174,12 +180,13 @@ exports.editProduct = async (req, res, theClass) => {
  * @param { String } barcode
  * @param { Number } amount
  */
-exports.editProductAmount = async (req, res, theClass) => {
+exports.editProductAmount = async (req, res) => {
   /** Get req.body */
   const { barcode, amount } = req.body
+  const collectionName = req.params.collection
 
   /** Check if sold out */
-  await theClass.findOne({ barcode })
+  await Product.findOne({ collectionName, barcode })
     .then(async product => {
       if (amount < 0 && (product.amount + Number(amount)) < 0) return res.status(400).json({ msg: "Can't sell all this amount" })
 
@@ -195,17 +202,21 @@ exports.editProductAmount = async (req, res, theClass) => {
 /** Delete Product
  * @param { String } barcode
 */
-exports.deleteOne = async (req, res, theClass) => {
+exports.deleteOne = async (req, res) => {
   const barcode = req.params.barcode
-  await theClass.deleteOne({ barcode: barcode })
+  const collectionName = req.params.collection
+
+  await Product.deleteOne({ collectionName, barcode })
     .then(result => res.status(200).json(result))
     .catch(err => res.status(400).json({ success: false }))
 }
 
 /** Delete All
 */
-exports.deleteAll = async (req, res, theClass) => {
-  await theClass.deleteMany({})
+exports.deleteAll = async (req, res) => {
+  const collectionName = req.params.collection
+
+  await Product.deleteMany({ collectionName })
     .then(() => {
       res.status(200).json({ msg: 'done' })
     })
