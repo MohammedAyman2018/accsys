@@ -2,33 +2,37 @@ var express = require('express')
 var router = express.Router()
 
 const { upload } = require('../middlewares/upload')
+const auth = require('../middlewares/auth')
 
 const {
   getAllProducts,
+  searchWithBarcode,
+  getAllProductsInCollection,
   getWithPagenation,
   filter,
-  getOneProduct,
   addProduct,
   editProductAmount,
   editProduct,
   deleteOne,
   deleteAll
 } = require('../controllers/product_ctrl')
-const auth = require('../middlewares/auth')
 
 /** Get All Products */
-router.get('/:collection/products/all', getAllProducts)
+router.get('/', getAllProducts)
 
-/** Get All Products with pagenation */
+/** Get search with barcode */
+router.get('/barcode/:barcode', searchWithBarcode)
+
+/** Get All Products in collection */
+router.get('/:collection/products/all', getAllProductsInCollection)
+
+/** Get Products with pagenation */
 router.get('/:collection/:page', getWithPagenation)
 
 /** filter with name */
 router.post('/:collection/filter', filter)
 
-/** Get one Product */
-router.get('/:collection/one/:barcode', getOneProduct)
-
-/** Add Product Medical */
+/** Add Product */
 router.post('/:collection/', auth, upload.single('image'), addProduct)
 
 /** Change Amount */

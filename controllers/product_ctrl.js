@@ -2,10 +2,30 @@ const { validate, Product } = require('../models/Product_model')
 const { cloudinary } = require('../middlewares/upload')
 require('dotenv')
 
-/** Get All Data
+/** Get All Data In a collection
  * @returns { object } All products
  */
 exports.getAllProducts = async (req, res) => {
+  await Product.find({})
+    .then(products => res.status(200).json(products))
+    .catch(err => res.status(400).json(err))
+}
+
+/**
+ * return Product with the same Barcode
+ * @param {String} barcode
+ */
+exports.searchWithBarcode = async (req, res) => {
+  const { barcode } = req.params
+  await Product.findOne({ barcode })
+    .then(product => res.status(200).json(product))
+    .catch(err => res.status(400).json(err))
+}
+
+/** Get All Data In a collection
+ * @returns { object } All products
+ */
+exports.getAllProductsInCollection = async (req, res) => {
   const collectionName = req.params.collection
   console.log(collectionName)
   await Product.find({ collectionName })
@@ -35,27 +55,6 @@ exports.getWithPagenation = async (req, res) => {
           pages: Math.ceil(count / perPage)
         })
       })
-    })
-}
-
-/** Get one product
- * @param { Number } barcode
- * @returns { object } The product
- */
-exports.getOneProduct = async (req, res) => {
-  const collectionName = req.params.collection
-
-  await Product.findOne({ collectionName, barcode: req.params.barcode })
-    .then(async product => {
-      if (!product) return res.status(400).json({ msg: 'There is no product.' })
-      res.status(200).json({
-        product: product,
-        samilier: await Product.find({ brand: product.brand }).limit(9)
-      })
-    })
-    .catch(err => {
-      console.log({ msg: err.message })
-      res.status(400).json({ msg: err.message })
     })
 }
 
