@@ -58,6 +58,25 @@ exports.getWithPagenation = async (req, res) => {
     })
 }
 
+/** Get one product
+ * @param { Number } barcode
+ * @returns { object } The product
+ */
+exports.getOneProduct = async (req, res) => {
+  await Product.findOne({ barcode: req.params.barcode })
+    .then(async product => {
+      if (!product) return res.status(400).json({ msg: 'There is no product.' })
+      res.status(200).json({
+        product: product,
+        samilier: await Product.find({ brand: product.brand }).limit(9)
+      })
+    })
+    .catch(err => {
+      console.log({ msg: err.message })
+      res.status(400).json({ msg: err.message })
+    })
+}
+
 /** Filter
  * @param { String } name
  * @param { String } barcode

@@ -9,6 +9,7 @@ const {
   searchWithBarcode,
   getAllProductsInCollection,
   getWithPagenation,
+  getOneProduct,
   filter,
   addProduct,
   editProductAmount,
@@ -22,6 +23,9 @@ router.get('/', getAllProducts)
 
 /** Get search with barcode */
 router.get('/barcode/:barcode', searchWithBarcode)
+
+/** Get product with  */
+router.get('/one/:barcode', getOneProduct)
 
 /** Get All Products in collection */
 router.get('/:collection/products/all', getAllProductsInCollection)
