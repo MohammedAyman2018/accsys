@@ -40,7 +40,7 @@ router.post('/:collection/filter', filter)
 router.post('/:collection/', auth, upload.single('image'), addProduct)
 
 /** Change Amount */
-router.put('/:collection/amount', auth, editProductAmount)
+router.put('/:collection/amount', editProductAmount)
 
 /** Update Product */
 router.put('/:collection/', auth, upload.single('image'), editProduct)
