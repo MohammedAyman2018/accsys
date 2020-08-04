@@ -5,7 +5,7 @@ const controller = require('../controllers/order_ctrl')
 const auth = require('../middlewares/auth')
 
 router.get('/', auth, controller.getAllOrders)
-router.get('/:id', auth, controller.getOneOrder)
+router.get('/:id', controller.getOneOrder)
 
 router.post('/', controller.addOrder)
 router.patch('/:id', auth, controller.editOrder)
